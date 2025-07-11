@@ -32,7 +32,7 @@ RUN chown -R www-data:www-data /var/www/html \
 # Expose Apache
 # EXPOSE 80
 # Expose Laravel port
-EXPOSE 8080
+EXPOSE 80
 
 # Start Laravel using Artisan (not Apache)
 CMD ["apache2-foreground"]
