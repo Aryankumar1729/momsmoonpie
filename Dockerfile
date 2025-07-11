@@ -1,7 +1,7 @@
-# Use official PHP image with Apache
+# Start with PHP + Apache image
 FROM php:8.2-apache
 
-# Install system dependencies
+# Install system dependencies & PHP extensions
 RUN apt-get update && apt-get install -y \
     unzip \
     git \
@@ -10,23 +10,24 @@ RUN apt-get update && apt-get install -y \
     zip \
     && docker-php-ext-install pdo pdo_mysql zip
 
-# Enable Apache mod_rewrite for Laravel routing
+# Enable Apache mod_rewrite
 RUN a2enmod rewrite
 
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy project files into container
-COPY . .
-
-# Install Composer
+# Copy Composer from composer image (do this BEFORE copying app)
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader
+# Copy app files
+COPY . .
 
-# Fix permissions (Laravel storage & cache)
-RUN chown -R www-data:www-data storage bootstrap/cache
+# Install PHP dependencies using Composer
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress
 
-# Expose port 80
+# Set permissions for Laravel
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 775 storage bootstrap/cache
+
+# Expose Apache
 EXPOSE 80
