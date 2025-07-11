@@ -30,4 +30,9 @@ RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 775 storage bootstrap/cache
 
 # Expose Apache
-EXPOSE 80
+# EXPOSE 80
+# Expose Laravel port
+EXPOSE 8000
+
+# Start Laravel using Artisan (not Apache)
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
